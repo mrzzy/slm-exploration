@@ -1,0 +1,37 @@
+#
+# SLM Exploration
+# Docker Compose
+# SGlang Inference Runtime
+#
+
+services:
+   llm:
+    image: lmsysorg/sglang:v0.5.1.post3-cu126
+    container_name: sglang
+    volumes:
+      - "${HOME}/.cache/huggingface:/root/.cache/huggingface"
+    restart: always
+    network_mode: host # required by RDMA
+    privileged: true # required by RDMA
+    entrypoint: python3 -m sglang.launch_server
+    command: >
+      --model-path ${MODEL_ID}
+      --mem-fraction-static 0.7
+      --host 0.0.0.0
+      --port 8080
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    ipc: host
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:30000/health || exit 1"]
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      HF_TOKEN: "${HF_TOKEN}"

@@ -1,0 +1,22 @@
+#
+# SLM Exploration
+# Docker Compose
+#
+
+services:
+  benchmark:
+    network_mode: host
+    image: ghcr.io/huggingface/inference-benchmarker:sha-687e477
+    volumes:
+      - "${HOME}/.cache/huggingface:/root/.cache/huggingface"
+      - ./results:/opt/inference-benchmarker/results
+    command: [
+      "inference-benchmarker",
+      "--tokenizer-name", "${MODEL_ID}",
+      "--model-name", "${MODEL_ID}",
+      "--profile", "classification",
+      "--url", "http://localhost:8080",
+      "--no-console",
+    ]
+    environment:
+      HF_TOKEN: "${HF_TOKEN}"

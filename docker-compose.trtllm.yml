@@ -1,0 +1,33 @@
+#
+# SLM Exploration
+# Docker Compose
+# TGI Inference Runtime
+#
+
+services:
+  llm:
+    image: nvcr.io/nvidia/tensorrt-llm/release:0.21.0
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    shm_size: 64g
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    ipc: host
+    ports:
+      - "8080:80"
+    volumes:
+      - "${HOME}/.cache/huggingface:/root/.cache/huggingface"
+    command:
+      - "trtllm-serve"
+      - "serve"
+      - "${MODEL_ID}"
+    environment:
+      HF_TOKEN: "${HF_TOKEN}"
+      TRTLLM_FMHA_ENABLE: "0"

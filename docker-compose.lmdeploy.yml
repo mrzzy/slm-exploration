@@ -1,0 +1,30 @@
+#
+# SLM Exploration
+# Docker Compose
+# LMDeploy Inference Runtime
+#
+
+services:
+  llm:
+    image: openmmlab/lmdeploy:v0.9.2-cu12
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ipc: host
+    ports:
+      - "8080:23333"
+    volumes:
+      - "${HOME}/.cache/huggingface:/root/.cache/huggingface"
+    command: [
+      "lmdeploy",
+      "serve",
+      "api_server",
+      "${MODEL_ID}"
+    ]
+    environment:
+      HF_TOKEN: "${HF_TOKEN}"

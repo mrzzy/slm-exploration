@@ -1,0 +1,28 @@
+#
+# SLM Exploration
+# Docker Compose
+# TGI Inference Runtime
+#
+
+services:
+  llm:
+    image: ghcr.io/huggingface/text-generation-inference:3.3.4
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    shm_size: 64g
+    ports:
+      - "8080:80"
+    volumes:
+      - "${HOME}/.cache/huggingface:/root/.cache/huggingface"
+    command: [
+      "--model-id",
+      "${MODEL_ID}"
+    ]
+    environment:
+      HF_TOKEN: "${HF_TOKEN}"
